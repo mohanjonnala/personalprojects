@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.7); /* Updated to black with 70% transparency */
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            z-index: 1;
+            color: #fff;
+        }
+        .container2 {
+            background-color: rgba(0, 0, 0, 0.7);
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            z-index: 1;
+            color: #fff;
+            margin-left: 20px; /* Adjust the margin as needed */
+        }
+        .container3 {
+            max-height: 400px; /* Adjust the height as needed */
+            overflow-y: auto;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            text-align: center;
+            color: #fff;
+            margin-left:20px;
+        }
+
+        h1 {
+            color: #fff;
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+
+        h2 {
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        p {
+            color: #ddd;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <video muted loop playsinline id="backgroundVideo">
+        <source src="static\video\VIDEO1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <script>
+        document.getElementById('backgroundVideo').play();
+    </script>
+    
+    <div class="container">
+        <h1>Brain Tumor Classification</h1>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <label for="file">Choose an image:</label>
+            <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" required>
+            <button type="submit">Predict</button>
+        </form>
+        {% if efficient_pred %}
+        <div class="results">
+            <h2><U>RESULTS</U></h2>
+            <p>{{ efficient_pred }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="container3">
+        <h1>Brain Tumor Segmentation</h1>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <label for="image">Choose an image for segmentation:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+            <button type="submit">Segment</button>
+        </form>
+        {% if input_image %}
+        <div class="results">
+            <h2><u>Image Segmentation RESULTS</u></h2>
+            <div class="image-container">
+                <div class="image-container">
+    <div class="image">
+        <h2>Input Image</h2>
+        <img src="data:image/jpeg;base64,{{ input_image }}" width="256">
+    </div>
+    <div class="image">
+        <h2>Segmented Image</h2>
+        <img src="data:image/jpeg;base64,{{ mask_image }}" width="256">
+    </div>
+</div>
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="container2">
+        <h1>Survival Prediction</h1>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <label for="file_survival">Choose an image :</label>
+            <input type="file" id="file_survival" name="file_survival" accept=".nii, .nii.gz" required>
+    
+            <label for="age_survival">Enter Age:</label>
+            <input type="number" id="age_survival" name="age_survival" required>
+    
+            <button type="submit">Predict</button>
+        </form>
+        {% if predicted_class_survival %}
+        <div class="results">
+            <h2><u>Survival Prediction RESULTS</u></h2>
+            <p>Predicted Class: {{ predicted_class_survival }}</p>
+            <p>Probabilities: {{ probabilities_survival }}</p>
+            <p>Survival Duration: {{ survival_days }}</p>  <!-- Display the number of days -->
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
